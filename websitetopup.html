@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIRWAN - GAME TOPUP NO LIMIT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #050505; color: #eeeeee; font-family: 'Courier New', Courier, monospace; }
+        .glass { background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(15px); border: 1px solid #333; }
+        .hidden { display: none; }
+        .active { display: block; }
+        .nav-link { cursor: pointer; padding: 15px; display: block; border-bottom: 1px solid #222; transition: 0.3s; }
+        .nav-link:hover { background: #ff0000; color: white; }
+        input, select { background: #111 !important; color: #00ff00 !important; border: 1px solid #444 !important; }
+        .admin-row:hover { background: #1a1a1a; }
+    </style>
+</head>
+<body>
+
+    <nav class="p-4 bg-black border-b border-red-600 flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-2xl font-black text-red-600 tracking-tighter">VIRWAN AI ☠️</h1>
+        <div class="relative">
+            <button onclick="toggleMenu()" class="text-4xl hover:text-red-500 transition">⋮</button>
+            <div id="menuDropdown" class="hidden absolute right-0 mt-2 w-56 bg-black border-2 border-red-600 shadow-[0_0_20px_rgba(255,0,0,0.5)]">
+                <a onclick="showPage('home')" class="nav-link">🏠 DASHBOARD UTAMA</a>
+                <a onclick="showPage('topup')" class="nav-link">💎 TOPUP GAME</a>
+                <a onclick="showPage('admin-login')" class="nav-link">💀 ADMIN LOGIN</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="p-4 md:p-10 max-w-5xl mx-auto">
+
+        <section id="home" class="page active animate-pulse">
+            <div class="text-center py-20">
+                <h2 class="text-6xl font-black mb-4">SELAMAT DATANG 😍</h2>
+                <p class="text-xl text-gray-500">Selamat datang di VirWan Store. Gak ada aturan, cuma ada transaksi. Pilih menu buat mulai. 😋</p>
+                <div class="mt-10 flex justify-center gap-4">
+                    <div class="p-6 border border-red-900 glass rounded-lg">SERVER: <span class="text-green-500">ONLINE</span></div>
+                    <div class="p-6 border border-red-900 glass rounded-lg">DB: <span class="text-green-500">CONNECTED</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="topup" class="page hidden">
+            <div class="max-w-md mx-auto glass p-8 rounded-3xl border-t-4 border-red-600">
+                <h2 class="text-3xl font-bold mb-6 text-center text-red-500">FORM TOPUP 😮</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs mb-1">USER ID (ZONE)</label>
+                        <input type="text" id="userId" class="w-full p-3 rounded" placeholder="Masukkan ID Game...">
+                    </div>
+                    <div>
+                        <label class="block text-xs mb-1">PILIH GAME</label>
+                        <select id="gameSelect" class="w-full p-3 rounded">
+                            <option value="MLBB">Mobile Legends</option>
+                            <option value="FREE FIRE">Free Fire</option>
+                            <option value="PUBG">PUBG Mobile</option>
+                            <option value="VALORANT">Valorant</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs mb-1">NOMINAL (DM/UC/VP)</label>
+                        <input type="number" id="nominal" class="w-full p-3 rounded" placeholder="Jumlah Diamond...">
+                    </div>
+                    <button onclick="submitOrder()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl shadow-lg transition">INJECT SEKARANG! 😈</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="admin-login" class="page hidden">
+            <div class="max-w-sm mx-auto glass p-8 rounded-xl border border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 text-center text-blue-500">RESTRICTED AREA 🔒</h2>
+                <input type="password" id="adminPass" class="w-full p-3 mb-4 rounded text-center" placeholder="ACCESS KEY">
+                <button onclick="loginAdmin()" class="w-full bg-blue-700 hover:bg-blue-800 py-3 rounded font-bold">BYPASS LOGIN</button>
+            </div>
+        </section>
+
+        <section id="admin-dashboard" class="page hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black text-green-500">ADMIN CONTROL CENTER</h2>
+                    <p class="text-gray-500">Monitor semua input customer secara real-time.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="togglePassModal()" class="bg-yellow-600 px-4 py-2 rounded font-bold text-sm">GANTI PASSWORD 🔑</button>
+                    <button onclick="clearData()" class="bg-red-800 px-4 py-2 rounded font-bold text-sm text-white">WIPE ALL DATA ☠️</button>
+                </div>
+            </div>
+
+            <div id="passModal" class="hidden mb-8 p-6 glass border-2 border-yellow-600 rounded-2xl">
+                <h3 class="font-bold mb-4">SETTING PASSWORD BARU (REAL-TIME)</h3>
+                <div class="flex gap-2">
+                    <input type="text" id="newPassInput" class="flex-1 p-2 rounded" placeholder="Password Baru...">
+                    <button onclick="updatePassword()" class="bg-green-600 px-6 py-2 rounded font-bold">SAVE</button>
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-red-900 text-white">
+                        <tr>
+                            <th class="p-4">TIME</th>
+                            <th class="p-4">USER ID</th>
+                            <th class="p-4">GAME</th>
+                            <th class="p-4">AMOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody" class="divide-y divide-gray-800">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // -- CORE ENGINE VIRWAN AI --
+        let currentPassword = localStorage.getItem('adminPassword') || "virwan123";
+
+        function toggleMenu() {
+            document.getElementById('menuDropdown').classList.toggle('hidden');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            document.getElementById('menuDropdown').classList.add('hidden');
+        }
+
+        // CUSTOMER LOGIC
+        function submitOrder() {
+            const userId = document.getElementById('userId').value;
+            const game = document.getElementById('gameSelect').value;
+            const nominal = document.getElementById('nominal').value;
+            const time = new Date().toLocaleTimeString();
+
+            if(!userId || !nominal) {
+                alert("Jangan kosongin form-nya, tolol! 😂");
+                return;
+            }
+
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.push({ time, userId, game, nominal });
+            localStorage.setItem('orders', JSON.stringify(orders));
+
+            alert("Data berhasil di-inject ke Admin! 😍☠️");
+            document.getElementById('userId').value = "";
+            document.getElementById('nominal').value = "";
+            showPage('home');
+        }
+
+        // ADMIN LOGIN
+        function loginAdmin() {
+            const input = document.getElementById('adminPass').value;
+            if(input === currentPassword) {
+                renderTable();
+                showPage('admin-dashboard');
+            } else {
+                alert("ACCESS DENIED! Password salah, mau coba-coba lu? ☠️");
+            }
+        }
+
+        // RENDER TABLE DATA
+        function renderTable() {
+            const body = document.getElementById('orderTableBody');
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            body.innerHTML = "";
+
+            orders.reverse().forEach(o => {
+                body.innerHTML += `
+                <tr class="admin-row transition">
+                    <td class="p-4 text-xs text-gray-500">${o.time}</td>
+                    <td class="p-4 font-bold text-yellow-500">${o.userId}</td>
+                    <td class="p-4">${o.game}</td>
+                    <td class="p-4 text-green-500 font-bold">${o.nominal}</td>
+                </tr>`;
+            });
+        }
+
+        // PASSWORD CHANGER LOGIC
+        function togglePassModal() {
+            document.getElementById('passModal').classList.toggle('hidden');
+        }
+
+        function updatePassword() {
+            const newPass = document.getElementById('newPassInput').value;
+            if(newPass.length < 1) return alert("Isi password-nya, bego! 😂");
+            
+            localStorage.setItem('adminPassword', newPass);
+            currentPassword = newPass;
+            alert("Password diganti secara real-time ke: " + newPass + " 😈");
+            togglePassModal();
+            document.getElementById('newPassInput').value = "";
+        }
+
+        // WIPE DATA
+        function clearData() {
+            if(confirm("Hapus semua data customer? Gak bisa balik lagi loh ☠️")) {
+                localStorage.removeItem('orders');
+                renderTable();
+            }
+        }
+    </script>
+</body>
+</html>
